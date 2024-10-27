@@ -3,15 +3,24 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Windows.Forms;
 using System.Globalization;
+using AdvancedCalcByMarian.Functions;
 
 namespace AdvancedCalcByMarian
 {
+    public enum CalculatorMode
+    {
+        Scienstific,
+        Calculus
+    }
+
     public partial class Form1 : Form
     {
         private const int FUCKING_TWO = 2;
         private const int _three = 3;
         private const int _maxAmountOfLettersOfResultOutputToDecreaseFontSize = 21;
         private const int _numberToDecreaseTheResultOutputLableFontSize = 4;
+        private const int _sqrtOperatorNumber = 6;
+        private const int _logOperatorNumber = 7;
 
         private const string _closingBracket = ")";
         private const string _emptyString = "";
@@ -19,6 +28,12 @@ namespace AdvancedCalcByMarian
         private List<Symbol> _input = new List<Symbol>();
         private List<Symbol> _operatorStack = new List<Symbol>();
         private List<Symbol> _output = new List<Symbol>();
+
+        private List<History> _history = new List<History>();
+        CalculatorMode _mode = CalculatorMode.Scienstific;
+
+        private FunctionCategoriesStorage _functionCategoriesStorage = new FunctionCategoriesStorage();
+        public FunctionCategoriesStorage FunctionCategoriesStorage => _functionCategoriesStorage;
 
         private const string _messageWhenTheNumberHasTooManyDots = "One of numbers has more dots than needed. \nNumbers can have only one dot to be decimal";
         private const string _messageWhenTheInputIsNull = "You should enter a number here";
@@ -37,6 +52,7 @@ namespace AdvancedCalcByMarian
         private void Form1_Load(object sender, EventArgs e)
         {
             panel1.BackColor = Color.FromArgb(0xBF, 0xCD, 0xBF);
+            SwitchModes(CalculatorMode.Scienstific);
         }
 
         private void DarkThemeSwitch_CheckedChanged(object sender, EventArgs e)
@@ -141,8 +157,7 @@ namespace AdvancedCalcByMarian
 
         private void BackspaceButton_Click(object sender, EventArgs e)
         {
-            if (label2.Text != _emptyString)
-                label2.Text = label2.Text.Substring(0, label2.Text.Length - 1);
+            RemoveLastCharacterFromInput();
         }
 
         private void AddButton_Click(object sender, EventArgs e)
@@ -227,11 +242,28 @@ namespace AdvancedCalcByMarian
                 Write(_resultAfterCalculation);
         }
 
+        private void SqrtButton_Click(object sender, EventArgs e)
+        {
+            Write("sqrt(");
+            _isTrigiometryOperatorThere = true;
+        }
+
+        private void LogButton_Click(object sender, EventArgs e)
+        {
+            Write("log(");
+            _isTrigiometryOperatorThere = true;
+        }
+
         #endregion
 
         #region Clear
 
         private void ClearEverythingButton_Click(object sender, EventArgs e)
+        {
+            ClearEverything();
+        }
+
+        private void ClearEverything()
         {
             label2.Text = string.Empty;
             label1.Text = string.Empty;
@@ -248,10 +280,18 @@ namespace AdvancedCalcByMarian
             _output.Clear();
         }
 
+        private void RemoveLastCharacterFromInput()
+        {
+            if (label2.Text != _emptyString)
+                label2.Text = label2.Text.Substring(0, label2.Text.Length - 1);
+        }
+
         #endregion
 
         private void SetResultText(string input)
         {
+            // Here I tried to make the label1's font decrease when there is too many characters to show in the program
+
             if (label1.Text.Length >= _maxAmountOfLettersOfResultOutputToDecreaseFontSize)
             {
                 int timesToDecreaseTheFontSize = label1.Text.Length - _maxAmountOfLettersOfResultOutputToDecreaseFontSize;
@@ -265,6 +305,11 @@ namespace AdvancedCalcByMarian
 
         private void EqualButton_Click(object sender, EventArgs e)
         {
+            SeeResultOfCalculation();
+        }
+
+        private void SeeResultOfCalculation()
+        {
             ClearAllStacks();
             DivideTextIntoItems();
             ExportFromInputToOutput();
@@ -272,6 +317,8 @@ namespace AdvancedCalcByMarian
             _resultAfterCalculation = ReturnTheOutput();
             SetResultText(_resultAfterCalculation);
             //label2.Text = ShowStackItems(_output);
+
+            WriteNewStory();
         }
 
         private void DivideTextIntoItems()
@@ -281,6 +328,7 @@ namespace AdvancedCalcByMarian
             string futureTrigiometryOperator = _emptyString;
             int futureTrigiometryNumber = 0;
             int stepsToSkip = 0;
+            char previousCharacter = ' ';
 
             for (int i = 0; i < label2.Text.Length; i++)
             {
@@ -356,19 +404,13 @@ namespace AdvancedCalcByMarian
                         AddNewOperatorAndOperand(label2.Text[i], FUCKING_TWO * FUCKING_TWO, ref futureNumber, ref hasTheCurrentNumberThePoint);
                         break;
 
-                    case (char)Symboles.FIRST_LETTER_OF_COS:
+                    case (char)Symboles.LETTER_C:
                         futureTrigiometryOperator = "cos";
                         futureTrigiometryNumber = 0;
                         stepsToSkip = FUCKING_TWO;
                         break;
 
-                    case (char)Symboles.LETTER_S: // sin
-                        futureTrigiometryOperator = "sin";
-                        futureTrigiometryNumber = 1;
-                        stepsToSkip = FUCKING_TWO;
-                        break;
-
-                    case (char)Symboles.FIRST_LETTER_OF_TAN:
+                    case (char)Symboles.LETTER_T:
                         futureTrigiometryOperator = "tan";
                         futureTrigiometryNumber = 2;
                         stepsToSkip = FUCKING_TWO;
@@ -377,6 +419,24 @@ namespace AdvancedCalcByMarian
                     case (char)Symboles.LETTER_H:
                         futureTrigiometryOperator += "h";
                         futureTrigiometryNumber += _three;
+                        break;
+
+                    case (char)Symboles.LETTER_I: // i
+                        futureTrigiometryOperator = "sin";
+                        futureTrigiometryNumber = 1;
+                        stepsToSkip = 1;
+                        break;
+
+                    case (char)Symboles.LETTER_Q:
+                        futureTrigiometryOperator = "sqrt";
+                        futureTrigiometryNumber = _sqrtOperatorNumber;
+                        stepsToSkip = FUCKING_TWO;
+                        break;
+
+                    case (char)Symboles.LETTER_L:
+                        futureTrigiometryOperator = "log";
+                        futureTrigiometryNumber = _logOperatorNumber;
+                        stepsToSkip = FUCKING_TWO;
                         break;
                 }
             }
@@ -453,11 +513,7 @@ namespace AdvancedCalcByMarian
                                 break;
 
                             default:
-                                if (ConditionForLeftAssociativity(currentSymbol))
-                                    PopTheLastOperatorToOutputAndAddCurrentToItsStack(currentSymbol);
-                                else
-                                    AddOperatorToItsStack(currentSymbol);
-
+                                AddOperatorsWithEqualOrHigherPrecendence(currentSymbol);
                                 break;
                         }
 
@@ -486,6 +542,12 @@ namespace AdvancedCalcByMarian
             AddOperatorToItsStack(currentItem);
         }
 
+        private void PopTheLastOperatorToOutput()
+        {
+            _output.Add(_operatorStack[_operatorStack.Count - 1]);
+            _operatorStack.RemoveAt(_operatorStack.Count - 1);
+        }
+
         private bool CompareLPrecendence(int firstNumber, int secondNumber) // L - left-associated
         {
             if (firstNumber >= secondNumber) return true;
@@ -510,6 +572,20 @@ namespace AdvancedCalcByMarian
             return _operatorStack.Count != 0 && CompareRPrecendence(_operatorStack[_operatorStack.Count - 1].Precendence, currentSymbol.Precendence);
         }
 
+        private void AddOperatorsWithEqualOrHigherPrecendence(Symbol currentSymbol)
+        {
+            if (_operatorStack.Count == 0)
+                AddOperatorToItsStack(currentSymbol);
+            else
+            {
+                for (int i = _operatorStack.Count; i-- > 0;)
+                    if (ConditionForLeftAssociativity(currentSymbol))
+                        PopTheLastOperatorToOutput();
+
+                AddOperatorToItsStack(currentSymbol);
+            }
+        }
+
         private void AddOperatorToItsStack(Symbol oper)
         {
             _operatorStack.Add(oper);
@@ -521,13 +597,19 @@ namespace AdvancedCalcByMarian
             {
                 if (_operatorStack[i].Value == "(")
                 {
-                    _operatorStack.RemoveAt(i);
 
-                    if (_operatorStack[i - 1].Type == SymbolType.Function)
+                    if (_operatorStack.Last<Symbol>().Type == SymbolType.Function)
                     {
                         _output.Add(_operatorStack[i - 1]);
                         _operatorStack.RemoveAt(i - 1);
                     }
+
+                    _operatorStack.RemoveAt(i);
+
+
+
+                    //if (_operatorStack[i - 1].Type == SymbolType.Function)
+
 
                     break;
                 }
@@ -546,50 +628,84 @@ namespace AdvancedCalcByMarian
 
         private string ReturnTheOutput()
         {
-            List<float> numberStack = new List<float>();
-            float result = 0;
+            Stack<double> numberStack = new Stack<double>();
 
             for (int i = 0; i < _output.Count; i++)
             {
                 switch (_output[i].Type)
                 {
                     case SymbolType.Number:
-                        numberStack.Add(ConvertToFloat(_output[i].Value));
+                        double numberToPush = (double)ConvertToFloat(_output[i].Value);
+                        numberStack.Push(numberToPush);
                         break;
+
                     case SymbolType.Operator:
 
-                        float firstNumber = numberStack[numberStack.Count - FUCKING_TWO];
-                        float secondNumber = numberStack[numberStack.Count - 1];
+                        char currentOper = Convert.ToChar(_output[i].Value);
 
-                        char currentSymbol = Convert.ToChar(_output[i].Value);
+                        double firstNumber = numberStack.Pop();
+                        double secondNumber = numberStack.Pop();
 
-                        switch (currentSymbol)
+                        switch (currentOper)
                         {
                             case (char)Symboles.POWER:
-                                result = MathF.Pow(firstNumber, secondNumber);
-                                numberStack[numberStack.Count - FUCKING_TWO] = result;
+                                numberStack.Push(MathF.Pow((float)firstNumber, (float)secondNumber));
                                 break;
 
                             default:
-                                result = Calculate(firstNumber, secondNumber, currentSymbol);
-                                numberStack[numberStack.Count - FUCKING_TWO] = result;
+                                numberStack.Push(Calculate((float)firstNumber, (float)secondNumber, currentOper));
                                 break;
                         }
-
-                        numberStack.RemoveAt(numberStack.Count - 1);
 
                         break;
 
                     case SymbolType.Function:
-                        float number = numberStack[numberStack.Count - 1];
-                        result = ReturnTheNumberAfterTrigiometryOperations(number, _output[i].TrigiometryNumber);
-                        numberStack[numberStack.Count - 1] = result;
+                        double number = numberStack.Pop();
+                        numberStack.Push(ReturnTheNumberAfterTrigiometryOperations((float)number, _output[i].TrigiometryNumber));
                         break;
-
                 }
+
             }
 
-            return numberStack[numberStack.Count - 1].ToString();
+            return numberStack.Pop().ToString();
+
+            //double firstNumber = 0, secondNumber = 0;
+
+            //for (int i = 0; i < _output.Count; i++)
+            //{
+            //    switch (_output[i].Type)
+            //    {
+            //        case SymbolType.Number:
+            //            if (firstNumber == 0)
+            //                firstNumber = ConvertToFloat(_output[i].Value);
+            //            else
+            //                secondNumber = ConvertToFloat(_output[i].Value);
+            //            break;
+
+            //        case SymbolType.Operator:
+            //            char currentSymbol = Convert.ToChar(_output[i].Value);
+
+            //            switch (currentSymbol)
+            //            {
+            //                case (char)Symboles.POWER:
+            //                    firstNumber = MathF.Pow((float)firstNumber, (float)secondNumber);
+            //                    break;
+
+            //                default:
+            //                    firstNumber = Calculate((float)firstNumber, (float)secondNumber, currentSymbol);
+            //                    break;
+            //            }
+
+            //            break;
+
+            //        case SymbolType.Function:
+            //            firstNumber = ReturnTheNumberAfterTrigiometryOperations((float)firstNumber, _output[i].TrigiometryNumber);
+            //            break;
+            //    }
+
+            //}
+
+            //return firstNumber.ToString();
         }
 
         private float ConvertToFloat(string value)
@@ -664,6 +780,10 @@ namespace AdvancedCalcByMarian
                     return MathF.Sinh(radians);
                 case 5: // tanh
                     return MathF.Tanh(radians);
+                case _sqrtOperatorNumber: // sqrt
+                    return MathF.Sqrt(degrees);
+                case _logOperatorNumber: // log
+                    return MathF.Log(degrees);
             }
 
             return 0;
@@ -721,8 +841,8 @@ namespace AdvancedCalcByMarian
 
             ApplyColorsForNumberButtons(backColorOfButtonColorPallet, foreColorOfButtonColorPallet);
 
-            backColorOfButtonColorPallet = [ colorPallet[_three, 0], colorPallet[_three, 1], colorPallet[_three, FUCKING_TWO] ];
-            foreColorOfButtonColorPallet = [ colorPallet[FUCKING_TWO, 0], colorPallet[FUCKING_TWO, 1], colorPallet[FUCKING_TWO, FUCKING_TWO] ];
+            backColorOfButtonColorPallet = [colorPallet[_three, 0], colorPallet[_three, 1], colorPallet[_three, FUCKING_TWO]];
+            foreColorOfButtonColorPallet = [colorPallet[FUCKING_TWO, 0], colorPallet[FUCKING_TWO, 1], colorPallet[FUCKING_TWO, FUCKING_TWO]];
 
             ApplyColorsForOperatorButtons(backColorOfButtonColorPallet, foreColorOfButtonColorPallet);
 
@@ -736,24 +856,24 @@ namespace AdvancedCalcByMarian
 
         private void ApplyColorsForNumberButtons(int[] backColorPalete, int[] foreColorPalate)
         {
-            Button[] buttons = { ZeroNumberButton, 
-                PointButton, 
-                OpeningBracketButton, 
-                ClosingBracketButton, 
-                OneNumberButton, 
-                TwoNumberButton, 
-                ThreeNumberButton, 
-                FourNumberButton, 
-                FiveNumberButton, 
-                SixNumberButton, 
-                SevenNumberButton, 
-                EightNumberButton, 
-                NineNumberButton, 
-                BackspaceButton, 
-                PercenteButton, 
-                AddButton, 
-                SubtractButton, 
-                MultiplyButton, 
+            Button[] buttons = { ZeroNumberButton,
+                PointButton,
+                OpeningBracketButton,
+                ClosingBracketButton,
+                OneNumberButton,
+                TwoNumberButton,
+                ThreeNumberButton,
+                FourNumberButton,
+                FiveNumberButton,
+                SixNumberButton,
+                SevenNumberButton,
+                EightNumberButton,
+                NineNumberButton,
+                BackspaceButton,
+                PercenteButton,
+                AddButton,
+                SubtractButton,
+                MultiplyButton,
                 DivideButton };
 
             for (int i = 0; i < buttons.Length; i++)
@@ -765,20 +885,20 @@ namespace AdvancedCalcByMarian
 
         private void ApplyColorsForOperatorButtons(int[] backColorPalete, int[] foreColorPalate)
         {
-            Button[] buttons = { SquareButton, 
-                SqrtButton, 
-                MultiplyByItselfForYTimesButton, 
-                SinButton, 
-                CosButton, 
-                TanButton, 
-                SinhButton, 
-                CoshButton, 
-                TanhButton, 
-                FactorialButton, 
-                ExponentButton, 
-                AnsButton, 
-                LogButton, 
-                ModButton, 
+            Button[] buttons = { SquareButton,
+                SqrtButton,
+                MultiplyByItselfForYTimesButton,
+                SinButton,
+                CosButton,
+                TanButton,
+                SinhButton,
+                CoshButton,
+                TanhButton,
+                FactorialButton,
+                ExponentButton,
+                AnsButton,
+                LogButton,
+                ModButton,
                 TenMultipliedByXTime };
 
             for (int i = 0; i < buttons.Length; i++)
@@ -812,7 +932,7 @@ namespace AdvancedCalcByMarian
                 groupBox.ForeColor = Color.FromArgb(foreColorPalate[0], foreColorPalate[1], foreColorPalate[FUCKING_TWO]);
             }
 
-            for (int i = 0; i < buttons.Length;i++)
+            for (int i = 0; i < buttons.Length; i++)
             {
                 buttons[i].BackColor = Color.FromArgb(backColorPalate[0], backColorPalate[1], backColorPalate[FUCKING_TWO]);
                 buttons[i].ForeColor = Color.FromArgb(foreColorPalate[0], foreColorPalate[1], foreColorPalate[FUCKING_TWO]);
@@ -827,7 +947,207 @@ namespace AdvancedCalcByMarian
             aboutMe.Show();
         }
 
-        
+        private void Form1_KeyPress(object sender, KeyPressEventArgs e)
+        {
+
+        }
+
+        #region KeyboardInput
+
+        private void Form1_KeyDown(object sender, KeyEventArgs e)
+        {
+            switch (e.KeyCode)
+            {
+                case Keys.NumPad0:
+                case Keys.D0:
+                    Write("0");
+                    break;       // 0
+                case Keys.NumPad1:
+                case Keys.D1:
+                    Write("1");
+                    break;       // 1
+                case Keys.NumPad2:
+                case Keys.D2:
+                    Write("2");
+                    break;       // 2
+                case Keys.NumPad3:
+                case Keys.D3:
+                    Write("3");
+                    break;       // 3
+                case Keys.NumPad4:
+                case Keys.D4:
+                    Write("4");
+                    break;       // 4
+                case Keys.NumPad5:
+                case Keys.D5:
+                    Write("5");
+                    break;       // 5
+                case Keys.NumPad6:
+                case Keys.D6:
+                    Write("6");
+                    break;       // 6
+                case Keys.NumPad7:
+                case Keys.D7:
+                    Write("7");
+                    break;       // 7
+                case Keys.NumPad8:
+                case Keys.D8:
+                    Write("8");
+                    break;       // 8
+                case Keys.NumPad9:
+                case Keys.D9:
+                    Write("9");
+                    break;       // 9
+                case Keys.Enter:
+                    SeeResultOfCalculation();
+                    break;    // Enter
+                case Keys.Back:
+                    RemoveLastCharacterFromInput();
+                    break;     // Backspace
+                case Keys.Add:
+                    WriteOperator("+");
+                    break;      // +
+                case Keys.Subtract:
+                    WriteOperator("-");
+                    break; // -
+                case Keys.Multiply:
+                    WriteOperator("*");
+                    break; // *
+                case Keys.Divide:
+                    WriteOperator("/");
+                    break;   // /
+                case Keys.Delete:
+                    ClearEverything();
+                    break;   // Delete
+            }
+        }
+
+        #endregion
+
+        #region History
+
+        private void historyToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            HistoryForm historyBrowser = new HistoryForm();
+            historyBrowser.ShowItselfAndCalcHistory(_history);
+        }
+
+        private void MemoryPlusButton_Click(object sender, EventArgs e)
+        {
+            if (label1.Text != _emptyString && label2.Text != _emptyString)
+                WriteNewStory();
+        }
+
+        private void WriteNewStory()
+        {
+            double resultToDouble = Convert.ToDouble(label1.Text);
+            _history.Add(new History(label2.Text, resultToDouble, _mode));
+        }
+
+        private void MemoryMinusButton_Click(object sender, EventArgs e)
+        {
+            if (_history.Count != 0)
+                _history.Remove(_history.Last());
+        }
+
+        private void MRButton_Click(object sender, EventArgs e)
+        {
+            if (_history.Count != 0)
+                Write(_history.Last().Result.ToString());
+            else
+                Write("0");
+        }
+
+        private void MCButton_Click(object sender, EventArgs e)
+        {
+            _history.Clear();
+        }
+
+        #endregion
+
+        #region CalculatorModeSwitcher
+
+        private void SwitchModes(CalculatorMode mode)
+        {
+            switch (mode)
+            {
+                case CalculatorMode.Scienstific:
+                    EnableScienctific(true);
+                    EnableCalculus(false);
+                    break;
+                case CalculatorMode.Calculus:
+                    EnableScienctific(false);
+                    EnableCalculus(true);
+                    break;
+            }
+        }
+
+        private void EnableScienctific(bool enable)
+        {
+            PercenteButton.Visible = enable;
+            FactorialButton.Visible = enable;
+            ExponentButton.Visible = enable;
+        }
+
+        private void EnableCalculus(bool enable)
+        {
+            FunctionButton.Visible = enable;
+            IntegralButton.Visible = enable;
+            XButton.Visible = enable;
+        }
+
+        private void ScientificModeButton_Click(object sender, EventArgs e)
+        {
+            _mode = CalculatorMode.Scienstific;
+            SwitchModes(_mode);
+        }
+
+        private void CalculusModeButton_Click(object sender, EventArgs e)
+        {
+            _mode = CalculatorMode.Calculus;
+            SwitchModes(_mode);
+        }
+
+        #endregion
+
+        private void FunctionButton_Click(object sender, EventArgs e)
+        {
+            //FunctionTest newFunction = new FunctionTest("Test0", "x+6-y*sin(60)/4*z-cos(45)+(zu/va)");
+            //FunctionTest pikmin = new FunctionTest("Test1", "6925-35675+25-x*56+sin(67)^2");
+            //FunctionTest mara = new FunctionTest("Test2", "x-7/da*4-22-4");
+
+            FunctionActionChoose functionActionChoose = new FunctionActionChoose();
+            functionActionChoose.ShowItself(_functionCategoriesStorage, this);
+        }
+
+        public void UpdateFunctionCategoriesStorage(FunctionCategoriesStorage functionCategoriesStorage)
+        {
+            _functionCategoriesStorage = functionCategoriesStorage;
+        }
+
+        // Debug tool to make sure that variable sorting works well
+        public class FunctionTest
+        {
+            private Function _newFunction;
+            private string _message;
+
+            public FunctionTest(string functionName, string functionExpression)
+            {
+                _newFunction = new Function(functionName, functionExpression);
+                _message = $"Name: {_newFunction.Name} \nExpression: {_newFunction.Expression}\nVariables: ";
+                
+                for (int i = 0; i < _newFunction.Variables.Length; i++)
+                {
+                    if (i != 0)
+                        _message += $", {_newFunction.Variables[i]} ";
+                    else
+                        _message += $"  {_newFunction.Variables[i]} ";
+                }
+                
+                _message += $"\nAmount of Variables: {_newFunction.AmountOfVariables} ";
+                MessageBox.Show(_message);
+            }
+        }
     }
 
     public class WrongNumberException
@@ -878,13 +1198,11 @@ namespace AdvancedCalcByMarian
         POINT = '.',
         POWER = '^',
         LETTER_S = 's',
-        MIDDLE_LETTER_OF_SIN = 'i',
-        LAST_LETTER_OF_SIN = 'n',
-        FIRST_LETTER_OF_COS = 'c',
-        MIDDLE_LETTER_OF_COS = 'o',
-        FIRST_LETTER_OF_TAN = 't',
-        MIDDLE_LETTER_OF_TAN = 'a',
-        LAST_LETTER_OF_TAN = 'n',
-        LETTER_H = 'h'
+        LETTER_I = 'i',
+        LETTER_C = 'c',
+        LETTER_T = 't',
+        LETTER_H = 'h',
+        LETTER_Q = 'q',
+        LETTER_L = 'l'
     }
 }

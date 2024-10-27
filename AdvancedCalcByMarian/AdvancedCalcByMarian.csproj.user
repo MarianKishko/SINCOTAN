@@ -7,5 +7,17 @@
     <Compile Update="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Update="Functions\ChooseFunctionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Functions\CreateNewFunctionForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="Functions\FunctionChoose.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Update="HistoryForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
   </ItemGroup>
 </Project>

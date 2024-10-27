@@ -76,6 +76,7 @@
             menuStrip1 = new MenuStrip();
             settingsToolStripMenuItem = new ToolStripMenuItem();
             aboutToolStripMenuItem = new ToolStripMenuItem();
+            historyToolStripMenuItem = new ToolStripMenuItem();
             ScientificModeButton = new Button();
             CalculusModeButton = new Button();
             ProgrammerModeButton = new Button();
@@ -90,6 +91,9 @@
             AreaConvertButton = new Button();
             LengthConvertButton = new Button();
             groupBox1 = new GroupBox();
+            FunctionButton = new Button();
+            IntegralButton = new Button();
+            XButton = new Button();
             panel1.SuspendLayout();
             menuStrip1.SuspendLayout();
             ConverterGroupBox.SuspendLayout();
@@ -472,6 +476,7 @@
             SqrtButton.TabIndex = 33;
             SqrtButton.Text = "sqrt(x)";
             SqrtButton.UseVisualStyleBackColor = false;
+            SqrtButton.Click += SqrtButton_Click;
             // 
             // TanhButton
             // 
@@ -554,6 +559,7 @@
             LogButton.TabIndex = 27;
             LogButton.Text = "log x";
             LogButton.UseVisualStyleBackColor = false;
+            LogButton.Click += LogButton_Click;
             // 
             // SinhButton
             // 
@@ -651,6 +657,7 @@
             MCButton.TabIndex = 40;
             MCButton.Text = "MC";
             MCButton.UseVisualStyleBackColor = false;
+            MCButton.Click += MCButton_Click;
             // 
             // MRButton
             // 
@@ -664,6 +671,7 @@
             MRButton.TabIndex = 39;
             MRButton.Text = "MR";
             MRButton.UseVisualStyleBackColor = false;
+            MRButton.Click += MRButton_Click;
             // 
             // MemoryMinusButton
             // 
@@ -677,6 +685,7 @@
             MemoryMinusButton.TabIndex = 38;
             MemoryMinusButton.Text = "M-";
             MemoryMinusButton.UseVisualStyleBackColor = false;
+            MemoryMinusButton.Click += MemoryMinusButton_Click;
             // 
             // MemoryPlusButton
             // 
@@ -690,11 +699,12 @@
             MemoryPlusButton.TabIndex = 37;
             MemoryPlusButton.Text = "M+";
             MemoryPlusButton.UseVisualStyleBackColor = false;
+            MemoryPlusButton.Click += MemoryPlusButton_Click;
             // 
             // menuStrip1
             // 
             menuStrip1.ImageScalingSize = new Size(24, 24);
-            menuStrip1.Items.AddRange(new ToolStripItem[] { settingsToolStripMenuItem, aboutToolStripMenuItem });
+            menuStrip1.Items.AddRange(new ToolStripItem[] { settingsToolStripMenuItem, aboutToolStripMenuItem, historyToolStripMenuItem });
             menuStrip1.Location = new Point(0, 0);
             menuStrip1.Name = "menuStrip1";
             menuStrip1.Size = new Size(1491, 33);
@@ -714,6 +724,13 @@
             aboutToolStripMenuItem.Text = "About";
             aboutToolStripMenuItem.Click += aboutToolStripMenuItem_Click;
             // 
+            // historyToolStripMenuItem
+            // 
+            historyToolStripMenuItem.Name = "historyToolStripMenuItem";
+            historyToolStripMenuItem.Size = new Size(85, 29);
+            historyToolStripMenuItem.Text = "History";
+            historyToolStripMenuItem.Click += historyToolStripMenuItem_Click;
+            // 
             // ScientificModeButton
             // 
             ScientificModeButton.BackColor = Color.Gainsboro;
@@ -723,10 +740,11 @@
             ScientificModeButton.ForeColor = SystemColors.ActiveCaptionText;
             ScientificModeButton.Location = new Point(0, 28);
             ScientificModeButton.Name = "ScientificModeButton";
-            ScientificModeButton.Size = new Size(313, 34);
+            ScientificModeButton.Size = new Size(300, 34);
             ScientificModeButton.TabIndex = 0;
             ScientificModeButton.Text = "Scientific";
             ScientificModeButton.UseVisualStyleBackColor = false;
+            ScientificModeButton.Click += ScientificModeButton_Click;
             // 
             // CalculusModeButton
             // 
@@ -737,10 +755,11 @@
             CalculusModeButton.ForeColor = SystemColors.ActiveCaptionText;
             CalculusModeButton.Location = new Point(0, 68);
             CalculusModeButton.Name = "CalculusModeButton";
-            CalculusModeButton.Size = new Size(313, 34);
+            CalculusModeButton.Size = new Size(300, 34);
             CalculusModeButton.TabIndex = 1;
             CalculusModeButton.Text = "Calculus";
             CalculusModeButton.UseVisualStyleBackColor = false;
+            CalculusModeButton.Click += CalculusModeButton_Click;
             // 
             // ProgrammerModeButton
             // 
@@ -751,7 +770,7 @@
             ProgrammerModeButton.ForeColor = SystemColors.ActiveCaptionText;
             ProgrammerModeButton.Location = new Point(0, 108);
             ProgrammerModeButton.Name = "ProgrammerModeButton";
-            ProgrammerModeButton.Size = new Size(313, 34);
+            ProgrammerModeButton.Size = new Size(300, 34);
             ProgrammerModeButton.TabIndex = 2;
             ProgrammerModeButton.Text = "Programming";
             ProgrammerModeButton.UseVisualStyleBackColor = false;
@@ -765,7 +784,7 @@
             DateModeButton.ForeColor = SystemColors.ActiveCaptionText;
             DateModeButton.Location = new Point(0, 148);
             DateModeButton.Name = "DateModeButton";
-            DateModeButton.Size = new Size(313, 34);
+            DateModeButton.Size = new Size(300, 34);
             DateModeButton.TabIndex = 3;
             DateModeButton.Text = "Date";
             DateModeButton.UseVisualStyleBackColor = false;
@@ -784,7 +803,7 @@
             ConverterGroupBox.Font = new Font("Segoe UI", 9F, FontStyle.Bold, GraphicsUnit.Point, 0);
             ConverterGroupBox.Location = new Point(0, 188);
             ConverterGroupBox.Name = "ConverterGroupBox";
-            ConverterGroupBox.Size = new Size(313, 528);
+            ConverterGroupBox.Size = new Size(300, 528);
             ConverterGroupBox.TabIndex = 4;
             ConverterGroupBox.TabStop = false;
             ConverterGroupBox.Text = "Converter";
@@ -798,7 +817,7 @@
             PressureConvertButton.ForeColor = SystemColors.ActiveCaptionText;
             PressureConvertButton.Location = new Point(0, 310);
             PressureConvertButton.Name = "PressureConvertButton";
-            PressureConvertButton.Size = new Size(313, 34);
+            PressureConvertButton.Size = new Size(300, 34);
             PressureConvertButton.TabIndex = 12;
             PressureConvertButton.Text = "Pressure";
             PressureConvertButton.UseVisualStyleBackColor = false;
@@ -812,7 +831,7 @@
             MassConvertButton.ForeColor = SystemColors.ActiveCaptionText;
             MassConvertButton.Location = new Point(0, 270);
             MassConvertButton.Name = "MassConvertButton";
-            MassConvertButton.Size = new Size(313, 34);
+            MassConvertButton.Size = new Size(300, 34);
             MassConvertButton.TabIndex = 11;
             MassConvertButton.Text = "Mass";
             MassConvertButton.UseVisualStyleBackColor = false;
@@ -826,7 +845,7 @@
             SpeedConvertButton.ForeColor = SystemColors.ActiveCaptionText;
             SpeedConvertButton.Location = new Point(0, 230);
             SpeedConvertButton.Name = "SpeedConvertButton";
-            SpeedConvertButton.Size = new Size(313, 34);
+            SpeedConvertButton.Size = new Size(300, 34);
             SpeedConvertButton.TabIndex = 10;
             SpeedConvertButton.Text = "Speed";
             SpeedConvertButton.UseVisualStyleBackColor = false;
@@ -840,7 +859,7 @@
             AngleConvertButton.ForeColor = SystemColors.ActiveCaptionText;
             AngleConvertButton.Location = new Point(0, 190);
             AngleConvertButton.Name = "AngleConvertButton";
-            AngleConvertButton.Size = new Size(313, 34);
+            AngleConvertButton.Size = new Size(300, 34);
             AngleConvertButton.TabIndex = 9;
             AngleConvertButton.Text = "Angle";
             AngleConvertButton.UseVisualStyleBackColor = false;
@@ -854,7 +873,7 @@
             TimeConvertButton.ForeColor = SystemColors.ActiveCaptionText;
             TimeConvertButton.Location = new Point(0, 150);
             TimeConvertButton.Name = "TimeConvertButton";
-            TimeConvertButton.Size = new Size(313, 34);
+            TimeConvertButton.Size = new Size(300, 34);
             TimeConvertButton.TabIndex = 8;
             TimeConvertButton.Text = "Time";
             TimeConvertButton.UseVisualStyleBackColor = false;
@@ -868,7 +887,7 @@
             VolumeConvertButton.ForeColor = SystemColors.ActiveCaptionText;
             VolumeConvertButton.Location = new Point(0, 110);
             VolumeConvertButton.Name = "VolumeConvertButton";
-            VolumeConvertButton.Size = new Size(313, 34);
+            VolumeConvertButton.Size = new Size(300, 34);
             VolumeConvertButton.TabIndex = 7;
             VolumeConvertButton.Text = "Volume";
             VolumeConvertButton.UseVisualStyleBackColor = false;
@@ -882,7 +901,7 @@
             AreaConvertButton.ForeColor = SystemColors.ActiveCaptionText;
             AreaConvertButton.Location = new Point(0, 70);
             AreaConvertButton.Name = "AreaConvertButton";
-            AreaConvertButton.Size = new Size(313, 34);
+            AreaConvertButton.Size = new Size(300, 34);
             AreaConvertButton.TabIndex = 6;
             AreaConvertButton.Text = "Area";
             AreaConvertButton.UseVisualStyleBackColor = false;
@@ -896,7 +915,7 @@
             LengthConvertButton.ForeColor = SystemColors.ActiveCaptionText;
             LengthConvertButton.Location = new Point(0, 30);
             LengthConvertButton.Name = "LengthConvertButton";
-            LengthConvertButton.Size = new Size(313, 34);
+            LengthConvertButton.Size = new Size(300, 34);
             LengthConvertButton.TabIndex = 5;
             LengthConvertButton.Text = "Length";
             LengthConvertButton.UseVisualStyleBackColor = false;
@@ -917,12 +936,55 @@
             groupBox1.TabStop = false;
             groupBox1.Text = "Calculator";
             // 
+            // FunctionButton
+            // 
+            FunctionButton.BackColor = Color.FromArgb(169, 178, 187);
+            FunctionButton.FlatStyle = FlatStyle.Flat;
+            FunctionButton.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            FunctionButton.ForeColor = Color.Black;
+            FunctionButton.Location = new Point(922, 679);
+            FunctionButton.Name = "FunctionButton";
+            FunctionButton.Size = new Size(123, 83);
+            FunctionButton.TabIndex = 44;
+            FunctionButton.Text = "f(x)";
+            FunctionButton.UseVisualStyleBackColor = false;
+            FunctionButton.Click += FunctionButton_Click;
+            // 
+            // IntegralButton
+            // 
+            IntegralButton.BackColor = Color.FromArgb(169, 178, 187);
+            IntegralButton.FlatStyle = FlatStyle.Flat;
+            IntegralButton.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            IntegralButton.ForeColor = Color.Black;
+            IntegralButton.Location = new Point(1051, 679);
+            IntegralButton.Name = "IntegralButton";
+            IntegralButton.Size = new Size(123, 83);
+            IntegralButton.TabIndex = 45;
+            IntegralButton.Text = "∫";
+            IntegralButton.UseVisualStyleBackColor = false;
+            // 
+            // XButton
+            // 
+            XButton.BackColor = Color.White;
+            XButton.FlatStyle = FlatStyle.Flat;
+            XButton.Font = new Font("Segoe UI", 12F, FontStyle.Regular, GraphicsUnit.Point, 0);
+            XButton.ForeColor = Color.Black;
+            XButton.Location = new Point(579, 325);
+            XButton.Name = "XButton";
+            XButton.Size = new Size(123, 83);
+            XButton.TabIndex = 46;
+            XButton.Text = "x";
+            XButton.UseVisualStyleBackColor = false;
+            // 
             // Form1
             // 
             AutoScaleDimensions = new SizeF(10F, 25F);
             AutoScaleMode = AutoScaleMode.Font;
             BackColor = Color.WhiteSmoke;
             ClientSize = new Size(1491, 784);
+            Controls.Add(XButton);
+            Controls.Add(IntegralButton);
+            Controls.Add(FunctionButton);
             Controls.Add(groupBox1);
             Controls.Add(EqualButton);
             Controls.Add(MCButton);
@@ -967,10 +1029,13 @@
             Controls.Add(DarkThemeSwitch);
             Controls.Add(panel1);
             Controls.Add(menuStrip1);
+            KeyPreview = true;
             MainMenuStrip = menuStrip1;
             Name = "Form1";
             Text = "SINCOTAN";
             Load += Form1_Load;
+            KeyDown += Form1_KeyDown;
+            KeyPress += Form1_KeyPress;
             panel1.ResumeLayout(false);
             menuStrip1.ResumeLayout(false);
             menuStrip1.PerformLayout();
@@ -1042,5 +1107,9 @@
         private Button AreaConvertButton;
         private Button LengthConvertButton;
         private GroupBox groupBox1;
+        private ToolStripMenuItem historyToolStripMenuItem;
+        private Button FunctionButton;
+        private Button IntegralButton;
+        private Button XButton;
     }
 }

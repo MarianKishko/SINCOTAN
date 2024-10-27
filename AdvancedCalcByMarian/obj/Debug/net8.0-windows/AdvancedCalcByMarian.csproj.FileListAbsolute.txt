@@ -16,3 +16,7 @@ C:\Users\mkisk\Documents\MeinEtwas\AdvancedCalcByMarian\AdvancedCalcByMarian\obj
 C:\Users\mkisk\Documents\MeinEtwas\AdvancedCalcByMarian\AdvancedCalcByMarian\obj\Debug\net8.0-windows\AdvancedCalcByMarian.genruntimeconfig.cache
 C:\Users\mkisk\Documents\MeinEtwas\AdvancedCalcByMarian\AdvancedCalcByMarian\obj\Debug\net8.0-windows\ref\AdvancedCalcByMarian.dll
 C:\Users\mkisk\Documents\MeinEtwas\AdvancedCalcByMarian\AdvancedCalcByMarian\obj\Debug\net8.0-windows\AdvancedCalcByMarian.AboutMe.resources
+C:\Users\mkisk\Documents\MeinEtwas\AdvancedCalcByMarian\AdvancedCalcByMarian\obj\Debug\net8.0-windows\AdvancedCalcByMarian.HistoryForm.resources
+C:\Users\mkisk\Documents\MeinEtwas\AdvancedCalcByMarian\AdvancedCalcByMarian\obj\Debug\net8.0-windows\AdvancedCalcByMarian.Functions.FunctionActionChoose.resources
+C:\Users\mkisk\Documents\MeinEtwas\AdvancedCalcByMarian\AdvancedCalcByMarian\obj\Debug\net8.0-windows\AdvancedCalcByMarian.Functions.CreateNewFunctionForm.resources
+C:\Users\mkisk\Documents\MeinEtwas\AdvancedCalcByMarian\AdvancedCalcByMarian\obj\Debug\net8.0-windows\AdvancedCalcByMarian.Functions.ChooseFunctionForm.resources

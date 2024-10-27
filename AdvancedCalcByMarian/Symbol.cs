@@ -38,11 +38,6 @@ namespace AdvancedCalcByMarian
             _precendence = precendence;
         }
         
-        public void SetNewValueAndNumberType(float value)
-        {
-            _value = value.ToString();
-            _type = SymbolType.Number;
-        }
     }
 
     public enum SymbolType
